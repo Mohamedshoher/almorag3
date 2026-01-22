@@ -22,7 +22,7 @@
     <Host Name="Document" />
   </Hosts>
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://[YOUR_GITHUB_URL]/src/taskpane.html" />
+    <SourceLocation DefaultValue="https://mohamedshoher.github.io/almorag3/src/taskpane.html" />
   </DefaultSettings>
   <Permissions>ReadWriteDocument</Permissions>
 
@@ -76,8 +76,8 @@
       </bt:Images>
       <bt:Urls>
         <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://go.microsoft.com/fwlink/?LinkId=276812" />
-        <bt:Url id="Commands.Url" DefaultValue="https://[YOUR_GITHUB_URL]/src/commands.html" />
-        <bt:Url id="Taskpane.Url" DefaultValue="https://[YOUR_GITHUB_URL]/src/taskpane.html" />
+        <bt:Url id="Commands.Url" DefaultValue="https://mohamedshoher.github.io/almorag3/src/commands.html" />
+        <bt:Url id="Taskpane.Url" DefaultValue="https://mohamedshoher.github.io/almorag3/src/taskpane.html" />
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GetStarted.Title" DefaultValue="ابدأ مع المراجع الذكي" />
@@ -144,14 +144,14 @@
       </Hosts>
       <Resources>
         <bt:Images>
-          <bt:Image id="Icon.16x16" DefaultValue="https://[YOUR_GITHUB_URL]/assets/icon-32.png" />
-          <bt:Image id="Icon.32x32" DefaultValue="https://[YOUR_GITHUB_URL]/assets/icon-32.png" />
-          <bt:Image id="Icon.80x80" DefaultValue="https://[YOUR_GITHUB_URL]/assets/icon-80.png" />
+          <bt:Image id="Icon.16x16" DefaultValue="https://mohamedshoher.github.io/almorag3/assets/icon-32.png" />
+          <bt:Image id="Icon.32x32" DefaultValue="https://mohamedshoher.github.io/almorag3/assets/icon-32.png" />
+          <bt:Image id="Icon.80x80" DefaultValue="https://mohamedshoher.github.io/almorag3/assets/icon-80.png" />
         </bt:Images>
         <bt:Urls>
           <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://go.microsoft.com/fwlink/?LinkId=276812" />
-          <bt:Url id="Commands.Url" DefaultValue="https://[YOUR_GITHUB_URL]/src/commands.html" />
-          <bt:Url id="Taskpane.Url" DefaultValue="https://[YOUR_GITHUB_URL]/src/taskpane.html" />
+          <bt:Url id="Commands.Url" DefaultValue="https://mohamedshoher.github.io/almorag3/src/commands.html" />
+          <bt:Url id="Taskpane.Url" DefaultValue="https://mohamedshoher.github.io/almorag3/src/taskpane.html" />
         </bt:Urls>
         <bt:ShortStrings>
           <bt:String id="GetStarted.Title" DefaultValue="ابدأ مع المراجع الذكي" />
