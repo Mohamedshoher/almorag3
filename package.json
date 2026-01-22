@@ -1,0 +1,18 @@
+{
+    "name": "word-grammar-checker",
+    "version": "1.0.0",
+    "description": "A Word Add-in for grammar checking",
+    "main": "src/taskpane.js",
+    "scripts": {
+        "start": "http-server src --ssl --cors -p 3000 -c-1 --cert \"%USERPROFILE%\\.office-addin-dev-certs\\localhost.crt\" --key \"%USERPROFILE%\\.office-addin-dev-certs\\localhost.key\""
+    },
+    "dependencies": {
+        "http-server": "^14.1.1"
+    },
+    "devDependencies": {
+        "office-addin-debugging": "^6.0.6",
+        "office-addin-dev-certs": "^2.0.6",
+        "office-addin-manifest": "^2.1.2",
+        "selfsigned": "^4.0.0"
+    }
+}

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المراجع اللغوي</title>
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <!-- Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="taskpane.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>المراجع الذكي</h1>
+                <div class="header-actions">
+                    <button id="history-btn" class="icon-btn" title="سجل العمليات">🕒</button>
+                    <button id="settings-btn" class="icon-btn settings-toggle" title="الإعدادات">⚙️</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- History Modal -->
+        <div id="history-modal" class="settings-modal hidden">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <h2>سجل العمليات</h2>
+                    <button id="close-history" class="close-btn">✕</button>
+                </div>
+                <div id="history-list" class="history-list">
+                    <p class="empty-msg">لا توجد عمليات سابقة.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="settings-modal hidden">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <h2>الإعدادات</h2>
+                    <button id="close-settings" class="close-btn">✕</button>
+                </div>
+                <div class="input-group">
+                    <label for="api-key">مفتاح API:</label>
+                    <input type="password" id="api-key" value="AIzaSyD6fDlC0_-YUcdz91mhyYF8oMCpUTXaRCo" />
+                </div>
+                <div class="input-group">
+                    <label for="model-select">النموذج:</label>
+                    <input type="text" id="model-select" value="gemini-2.5-flash"
+                        placeholder="مثال: gemini-2.5-flash" />
+                    <button id="fetch-models" class="secondary-btn">🔍 جلب النماذج</button>
+                    <div id="models-list" class="models-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quran Search Modal - Fullscreen Browser Style -->
+        <div id="quran-modal" class="settings-modal hidden">
+            <div class="settings-content quran-search-modal">
+                <div class="settings-header">
+                    <h2>البحث في القرآن الكريم</h2>
+                    <button id="close-quran" class="close-btn">✕</button>
+                </div>
+                <div class="quran-iframe-container">
+                    <iframe id="quran-iframe" src="https://tafsir.app/" frameborder="0"
+                        allow="clipboard-read; clipboard-write" style="width: 100%; height: 100%; border: none;">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alminasa Modal -->
+        <div id="alminasa-modal" class="settings-modal hidden">
+            <div class="settings-content quran-search-modal">
+                <div class="settings-header">
+                    <h2>المنصة الحديثة</h2>
+                    <button id="close-alminasa" class="close-btn">✕</button>
+                </div>
+                <div class="quran-iframe-container">
+                    <iframe id="alminasa-iframe" src="https://alminasa.ai/" frameborder="0"
+                        allow="clipboard-read; clipboard-write; microphone; camera"
+                        style="width: 100%; height: 100%; border: none;">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+
+        <!-- Turath Modal -->
+        <div id="turath-modal" class="settings-modal hidden">
+            <div class="settings-content quran-search-modal">
+                <div class="settings-header">
+                    <h2>جامع الكتب الإسلامية</h2>
+                    <button id="close-turath" class="close-btn">✕</button>
+                </div>
+                <div class="quran-iframe-container">
+                    <iframe id="turath-iframe" src="https://ketabonline.com/ar" frameborder="0"
+                        allow="clipboard-read; clipboard-write; microphone; camera"
+                        style="width: 100%; height: 100%; border: none;">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+
+        <!-- Internal Browser Modal -->
+        <div id="google-modal" class="settings-modal hidden">
+            <div class="settings-content quran-search-modal">
+                <div class="browser-toolbar">
+                    <div class="browser-controls">
+                        <button id="browser-back" title="للخلف">◀</button>
+                        <button id="browser-forward" title="للأمام">▶</button>
+                        <button id="browser-refresh" title="تحديث">🔄</button>
+                    </div>
+                    <div class="browser-address-bar">
+                        <input type="text" id="browser-url" placeholder="ابحث أو أدخل رابطاً..." dir="ltr" />
+                        <button id="browser-go">بحث</button>
+                    </div>
+                    <button id="close-google" class="browser-close" title="إغلاق">✕</button>
+                </div>
+                <div class="quran-iframe-container">
+                    <iframe id="google-iframe" src="about:blank" frameborder="0"
+                        allow="clipboard-read; clipboard-write; microphone; camera; fullscreen"
+                        style="width: 100%; height: 100%; border: none;">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+
+        <main>
+            <div class="main-sections">
+                <!-- Section 1: AI & Primary Actions -->
+                <section class="action-card primary-card">
+                    <div class="section-header">
+                        <span class="section-icon">✨</span>
+                        <h2>المراجعة الذكية</h2>
+                    </div>
+                    <button id="run-check" class="primary-button">
+                        <span class="icon">🔍</span> تشغيل المراجعة الشاملة
+                    </button>
+                    <button id="btn-fast-fix" class="tool-btn fast-fix-btn"
+                        title="إصلاح فوري وتلقائي للمسافات والترقيم">
+                        <span class="icon">⚡</span> الإصلاح التلقائي السريع
+                    </button>
+                </section>
+
+                <!-- Section 2: Text Formatting & Brackets -->
+                <section class="action-card">
+                    <div class="section-header">
+                        <span class="section-icon">✍️</span>
+                        <h2>تنسيق النصوص</h2>
+                    </div>
+
+                    <!-- Brackets Wrap -->
+                    <div class="sub-tool-group">
+                        <div class="bracket-palette">
+                            <button class="bracket-item" onclick="handleWrapText('(', ')')">( )</button>
+                            <button class="bracket-item" onclick="handleWrapText('[', ']')">[ ]</button>
+                            <button class="bracket-item" onclick="handleWrapText('-', '-')">- -</button>
+                            <button class="bracket-item" onclick="handleWrapText('﴿', '﴾')">﴿ ﴾</button>
+                            <button class="bracket-item" onclick="handleWrapText('«', '»')">« »</button>
+                            <button class="bracket-item" onclick="handleWrapText('&quot;', '&quot;')">" "</button>
+                        </div>
+                    </div>
+
+                    <div class="compact-grid">
+                        <button id="btn-tashkeel" class="tool-btn-small" title="إضافة التشكيل">
+                            <span class="icon">✨</span> تشكيل
+                        </button>
+                        <button id="btn-remove-tashkeel" class="tool-btn-small" title="إزالة التشكيل">
+                            <span class="icon">ـ</span> حذف تشكيل
+                        </button>
+                        <button id="btn-reverse-brackets" class="tool-btn-small" title="تصحيح الأقواس">
+                            <span class="icon">()</span> ضبط الأقواس
+                        </button>
+                        <button id="btn-remove-brackets" class="tool-btn-small danger-btn" title="حذف جميع الأقواس">
+                            <span class="icon">✂️</span> مسح الأقواس
+                        </button>
+                        <button id="btn-remove-empty-lines" class="tool-btn-small wide-btn" title="حذف الأسطر الفارغة">
+                            <span class="icon">☰</span> حذف الأسطر الفارغة
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Section 3: Research & External Resources -->
+                <section class="action-card">
+                    <div class="section-header">
+                        <span class="section-icon">🌐</span>
+                        <h2>المصادر والمراجع</h2>
+                    </div>
+                    <div class="resources-grid">
+                        <button id="btn-quran-search" class="resource-btn quran" title="القرآن الكريم">
+                            <span class="icon">📖</span> القرآن
+                        </button>
+                        <button id="btn-alminasa" class="resource-btn alminasa" title="المنصة الحديثة">
+                            <span class="icon">🤖</span> المنصة
+                        </button>
+                        <button id="btn-turath" class="resource-btn turath" title="جامع الكتب الإسلامية">
+                            <span class="icon">📚</span> جامع الكتب
+                        </button>
+                        <button id="btn-google-search" class="resource-btn google" title="بحث جوجل">
+                            <span class="icon">🔍</span> جوجل
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+
+
+
+
+            <div id="message-area" class="message-area"></div>
+
+            <!-- Results Fullscreen Modal -->
+            <div id="results-modal" class="settings-modal hidden">
+                <div class="settings-content quran-search-modal">
+                    <div class="settings-header" style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);">
+                        <h2>نتائج المراجعة الشاملة</h2>
+                        <div style="display: flex; gap: 10px;">
+                            <button id="export-pdf-modal" class="close-btn" title="تصدير PDF"
+                                style="font-size: 1.2rem; background: rgba(255,255,255,0.2);">📄</button>
+                            <button id="close-results" class="close-btn">✕</button>
+                        </div>
+                    </div>
+                    <div class="quran-iframe-container" style="padding: 15px; overflow-y: auto; background: #f8fafc;">
+                        <div id="progress-area" class="hidden" style="margin-bottom: 20px;">
+                            <div class="progress-bar">
+                                <div id="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <p id="progress-text">جاري المعالجة...</p>
+                        </div>
+
+                        <div id="results-area" class="results-area">
+                            <!-- Extra Spaces -->
+                            <div id="section-spaces" class="category-section hidden">
+                                <div class="category-header" onclick="toggleSection('spaces')">
+                                    <div class="header-title">
+                                        <h3>⚠️ مسافات زائدة</h3>
+                                        <span id="count-spaces" class="count-badge">0</span>
+                                    </div>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div id="content-spaces" class="section-content hidden">
+                                    <div class="batch-actions">
+                                        <button class="batch-btn" onclick="applyBatch('spaces')">إصلاح الكل</button>
+                                    </div>
+                                    <ul id="list-spaces"></ul>
+                                </div>
+                            </div>
+
+                            <!-- Spelling -->
+                            <div id="section-spelling" class="category-section hidden">
+                                <div class="category-header" onclick="toggleSection('spelling')">
+                                    <div class="header-title">
+                                        <h3>📝 أخطاء إملائية</h3>
+                                        <span id="count-spelling" class="count-badge">0</span>
+                                    </div>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div id="content-spelling" class="section-content hidden">
+                                    <div class="batch-actions">
+                                        <button class="batch-btn" onclick="applyBatch('spelling')">تطبيق الكل</button>
+                                    </div>
+                                    <ul id="list-spelling"></ul>
+                                </div>
+                            </div>
+
+                            <!-- Grammar -->
+                            <div id="section-grammar" class="category-section hidden">
+                                <div class="category-header" onclick="toggleSection('grammar')">
+                                    <div class="header-title">
+                                        <h3>📐 أخطاء نحوية</h3>
+                                        <span id="count-grammar" class="count-badge">0</span>
+                                    </div>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div id="content-grammar" class="section-content hidden">
+                                    <div class="batch-actions">
+                                        <button class="batch-btn" onclick="applyBatch('grammar')">تطبيق الكل</button>
+                                    </div>
+                                    <ul id="list-grammar"></ul>
+                                </div>
+                            </div>
+
+                            <!-- Punctuation -->
+                            <div id="section-punctuation" class="category-section hidden">
+                                <div class="category-header" onclick="toggleSection('punctuation')">
+                                    <div class="header-title">
+                                        <h3>، علامات الترقيم</h3>
+                                        <span id="count-punctuation" class="count-badge">0</span>
+                                    </div>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div id="content-punctuation" class="section-content hidden">
+                                    <div class="batch-actions">
+                                        <button class="batch-btn" onclick="applyBatch('punctuation')">تطبيق
+                                            الكل</button>
+                                    </div>
+                                    <ul id="list-punctuation"></ul>
+                                </div>
+                            </div>
+
+                            <!-- Style -->
+                            <div id="section-style" class="category-section hidden">
+                                <div class="category-header" onclick="toggleSection('style')">
+                                    <div class="header-title">
+                                        <h3>🎨 تحسينات أسلوبية</h3>
+                                        <span id="count-style" class="count-badge">0</span>
+                                    </div>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div id="content-style" class="section-content hidden">
+                                    <div class="batch-actions">
+                                        <button class="batch-btn" onclick="applyBatch('style')">تطبيق الكل</button>
+                                    </div>
+                                    <ul id="list-style"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- Main Scripts -->
+    <script src="taskpane.js"></script>
+</body>
+
+</html>
