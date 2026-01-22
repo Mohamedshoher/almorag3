@@ -1133,3 +1133,69 @@ h1 {
     flex: 1;
     overflow: hidden;
 }
+
+/* Linguistic Analysis Styles */
+.analysis-header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.analysis-section {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    margin-top: 15px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.syn-item:hover {
+    transform: translateY(-3px);
+    border-color: #10b981 !important;
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1);
+    background: #f0fdf4 !important;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scrollbar Style for the modal */
+.analysis-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.analysis-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.analysis-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.analysis-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

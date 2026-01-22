@@ -140,6 +140,18 @@ Office.onReady((info) => {
             exportPdfModal.onclick = exportToPDF;
         }
 
+        // Linguistic Analysis Modal Logic
+        const btnLinguistic = document.getElementById("btn-linguistic-analysis");
+        const analysisModal = document.getElementById("analysis-modal");
+        const closeAnalysis = document.getElementById("close-analysis");
+
+        if (btnLinguistic) {
+            btnLinguistic.onclick = handleLinguisticAnalysis;
+        }
+        if (closeAnalysis) {
+            closeAnalysis.onclick = () => analysisModal.classList.add("hidden");
+        }
+
         // Export PDF Logic (Legacy Support if needed)
         const exportBtn = document.getElementById("export-pdf");
         if (exportBtn) {
@@ -2004,5 +2016,157 @@ window.jumpToIndexItem = jumpToIndexItem;
 
 
 window.handleLocalReview = handleLocalReview;
+
+// --- Linguistic Analysis Logic ---
+
+async function handleLinguisticAnalysis() {
+    const apiKey = document.getElementById("api-key").value.trim();
+    if (!apiKey) {
+        showFeedback("⚠️ يرجى إدخال مفتاح API في الإعدادات أولاً.", "warning");
+        return;
+    }
+
+    const modal = document.getElementById("analysis-modal");
+    const loading = document.getElementById("analysis-loading");
+    const results = document.getElementById("analysis-results");
+
+    await Word.run(async (context) => {
+        const selection = context.document.getSelection();
+        selection.load("text");
+        await context.sync();
+
+        const word = selection.text ? selection.text.trim() : "";
+        if (!word || word.includes(" ")) {
+            showFeedback("⚠️ يرجى تحديد كلمة واحدة فقط للتحليل.", "warning");
+            return;
+        }
+
+        modal.classList.remove("hidden");
+        loading.classList.remove("hidden");
+        results.innerHTML = "";
+
+        let model = document.getElementById("model-select").value.trim();
+        const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
+
+        const prompt = `
+        حلل الكلمة التالية لغوياً بالتفصيل: "${word}"
+        يجب أن تشمل النتيجة:
+        1. المعنى العام.
+        2. الجذر اللغوي.
+        3. أهم المترادفات (Synonyms) مع شرح بسيط للفرق الدقيق لكل منها.
+        4. الأضداد (Antonyms).
+        5. أمثلة سياقية لاستخدامها.
+
+        أرجع النتيجة بصيغة JSON حصراً بهذا الهيكل (ولا تكتب أي نص آخر):
+        {
+          "word": "${word}",
+          "meaning": "المعنى العام هنا",
+          "root": "جذر الكلمة",
+          "synonyms": [{"word": "مترادف1", "desc": "شرح بسيط"}, {"word": "مترادف2", "desc": "شرح بسيط"}],
+          "antonyms": ["ضد1", "ضد2"],
+          "examples": ["مثال 1", "مثال 2"]
+        }
+        `;
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { temperature: 0.3 }
+                })
+            });
+
+            const data = await response.json();
+            loading.classList.add("hidden");
+
+            if (response.ok) {
+                let content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (content) {
+                    content = content.replace(/```json/g, '').replace(/```/g, '').trim();
+                    const analysisData = JSON.parse(content);
+                    renderLinguisticAnalysis(analysisData);
+                }
+            } else {
+                results.innerHTML = `<div style="color: red; text-align: center; padding: 20px;">حدث خطأ في الاتصال بالذكاء الاصطناعي: ${data.error?.message || 'خطأ غير معروف'}</div>`;
+            }
+        } catch (error) {
+            console.error("Analysis Error:", error);
+            loading.classList.add("hidden");
+            results.innerHTML = `<div style="color: red; text-align: center; padding: 20px;">فشل التحليل: ${error.message}</div>`;
+        }
+    });
+}
+
+function renderLinguisticAnalysis(data) {
+    const resultsArea = document.getElementById("analysis-results");
+
+    let html = `
+        <div class="analysis-card">
+            <div class="analysis-header-main">
+                <h1 style="font-size: 2.5rem; margin: 0; color: #065f46;">${data.word}</h1>
+                <div style="background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 20px; font-weight: bold;">الجذر: ${data.root}</div>
+            </div>
+
+            <div class="analysis-section" style="margin-top: 25px;">
+                <h3 style="color: #059669; border-bottom: 2px solid #b7e4c7; padding-bottom: 8px;">📖 المعنى والمدلول</h3>
+                <p style="font-size: 1.1rem; line-height: 1.8;">${data.meaning}</p>
+            </div>
+
+            <div class="analysis-section">
+                <h3 style="color: #059669; border-bottom: 2px solid #b7e4c7; padding-bottom: 8px;">🔄 المترادفات والبدائل (اضغط للاستبدال)</h3>
+                <div class="synonym-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+    `;
+
+    data.synonyms.forEach(syn => {
+        html += `
+            <div class="syn-item" onclick="replaceWordInDocument('${syn.word}')" style="background: white; border: 1px solid #b7e4c7; padding: 12px; border-radius: 12px; cursor: pointer; transition: all 0.2s;">
+                <strong style="color: #10b981; font-size: 1.2rem;">${syn.word}</strong>
+                <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: #6b7280;">${syn.desc}</p>
+            </div>
+        `;
+    });
+
+    html += `
+                </div>
+            </div>
+
+            <div class="analysis-section" style="margin-top: 25px;">
+                <h3 style="color: #059669; border-bottom: 2px solid #b7e4c7; padding-bottom: 8px;">🚫 الأضداد</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                    ${data.antonyms.map(ant => `<span style="background: #fee2e2; color: #991b1b; padding: 5px 15px; border-radius: 8px; font-weight: bold;">${ant}</span>`).join('')}
+                </div>
+            </div>
+
+            <div class="analysis-section" style="margin-top: 25px;">
+                <h3 style="color: #059669; border-bottom: 2px solid #b7e4c7; padding-bottom: 8px;">📝 أمثلة سياقية</h3>
+                <ul style="padding-right: 20px; line-height: 1.8;">
+                    ${data.examples.map(ex => `<li>${ex}</li>`).join('')}
+                </ul>
+            </div>
+        </div>
+    `;
+
+    resultsArea.innerHTML = html;
+}
+
+async function replaceWordInDocument(newWord) {
+    try {
+        await Word.run(async (context) => {
+            const selection = context.document.getSelection();
+            selection.insertText(newWord, Word.InsertLocation.replace);
+            await context.sync();
+            showFeedback(`✅ تم استبدال الكلمة بـ "${newWord}"`, "success");
+
+            // إغلاق المودال بعد الاستبدال
+            document.getElementById("analysis-modal").classList.add("hidden");
+        });
+    } catch (error) {
+        console.error("Replace Error:", error);
+    }
+}
+
+window.replaceWordInDocument = replaceWordInDocument;
 
 
