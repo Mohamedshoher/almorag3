@@ -59,6 +59,7 @@
                   <Action xsi:type="ShowTaskpane">
                     <TaskpaneId>ButtonId1</TaskpaneId>
                     <SourceLocation Resid="Taskpane.Url" />
+                    <SupportsPinning>true</SupportsPinning>
                   </Action>
                 </Control>
               </Group>
@@ -126,6 +127,7 @@
                     <Action xsi:type="ShowTaskpane">
                       <TaskpaneId>ButtonId1</TaskpaneId>
                       <SourceLocation Resid="Taskpane.Url" />
+                      <SupportsPinning>true</SupportsPinning>
                     </Action>
                   </Control>
                 </Group>
