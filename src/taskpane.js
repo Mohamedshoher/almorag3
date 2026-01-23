@@ -383,6 +383,21 @@ async function handleSpacingReview() {
             }
         }
 
+        // د. فقدان المسافة بعد قوس الإغلاق
+        for (let b of closingBrackets) {
+            // نستخدم regex يبحث عن قوس الإغلاق متبوعاً بحرف ليس مسافة وليس علامة ترقيم أو قوس إغلاق آخر
+            const regex = new RegExp(`\\${b}([^\\s\\)\\]\\}﴾»›>،؛\\.:!؟\\d])`, 'g');
+            let match;
+            while ((match = regex.exec(fullText)) !== null) {
+                spacingIssues.push({
+                    error: match[0],
+                    correction: b + ' ' + match[1],
+                    reason: `يجب ترك مسافة بعد قوس الإغلاق "${b}".`,
+                    category: "afterCloseBracket"
+                });
+            }
+        }
+
         progressFill.style.width = "100%";
         progressArea.classList.add("hidden");
 
@@ -1246,8 +1261,9 @@ async function handleWrapText(openBracket, closeBracket) {
         await context.sync();
 
         if (range.text && range.text.trim().length > 0) {
-            const originalText = range.text;
-            const newText = openBracket + originalText + closeBracket;
+            const originalText = range.text.trim();
+            // إضافة مسافات قبل وبعد الأقواس حسب القواعد العربية
+            const newText = " " + openBracket + originalText + closeBracket + " ";
             range.insertText(newText, Word.InsertLocation.replace);
 
             // Re-select to show result
@@ -1368,9 +1384,11 @@ async function handleFastAutoFix() {
         text = text
             .replace(/ {2,}/g, ' ')                        // 1. Multiple spaces -> Single
             .replace(/\s+([،؛.:!؟)])/g, '$1')              // 2. Remove space BEFORE punctuation
-            .replace(/([،؛.:!؟])(?![ \s\)\d\u0660-\u0669])/g, '$1 ') // 3. Add space AFTER punctuation (if not followed by digit/space)
+            .replace(/([،؛.:!؟])(?![ \s\)\d\u0660-\u0669])/g, '$1 ') // 3. Add space AFTER punctuation
             .replace(/([(\[﴿«])\s+/g, '$1')                 // 5. Remove space AFTER opening brackets
-            .replace(/\s+([)\]﴾»])/g, '$1');                // 6. Remove space BEFORE closing brackets
+            .replace(/\s+([)\]﴾»])/g, '$1')                // 6. Remove space BEFORE closing brackets
+            .replace(/([^ \s(\[﴿«/])([(\[﴿«])/g, '$1 $2')  // 7. Add space BEFORE opening bracket
+            .replace(/([)\]﴾»])([^ \s)\]﴾»،.;:!؟\d\u0660-\u0669])/g, '$1 $2'); // 8. Add space AFTER closing bracket
 
         if (text !== originalText) {
             targetRange.insertText(text, Word.InsertLocation.replace);
