@@ -49,7 +49,7 @@
                 </div>
                 <div class="input-group">
                     <label for="api-key">مفتاح API:</label>
-                    <input type="password" id="api-key" value="AIzaSyD6fDlC0_-YUcdz91mhyYF8oMCpUTXaRCo" />
+                    <input type="password" id="api-key" value="" placeholder="أدخل مفتاح Gemini API هنا..." />
                 </div>
                 <div class="input-group">
                     <label for="model-select">النموذج:</label>
@@ -155,14 +155,17 @@
 
         <main>
             <div class="main-sections">
-                <!-- Section 1: AI & Primary Actions -->
                 <section class="action-card primary-card">
                     <div class="section-header">
                         <span class="section-icon">✨</span>
-                        <h2>المراجعة الذكية</h2>
+                        <h2>المراجعة والتحليل الذكي</h2>
                     </div>
                     <button id="run-check" class="primary-button">
                         <span class="icon">🔍</span> تشغيل المراجعة الشاملة
+                    </button>
+                    <button id="btn-linguistic-analysis" class="primary-button"
+                        style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                        <span class="icon">🧠</span> التحليل اللغوي والمعجم
                     </button>
                     <button id="btn-fast-fix" class="tool-btn fast-fix-btn"
                         title="إصلاح فوري وتلقائي للمسافات والترقيم">
@@ -208,17 +211,7 @@
                     </div>
                 </section>
 
-                <!-- Section: Language Tools -->
-                <section class="action-card primary-card">
-                    <div class="section-header">
-                        <span class="section-icon">📚</span>
-                        <h2>أدوات اللغة والمعاجم</h2>
-                    </div>
-                    <button id="btn-linguistic-analysis" class="primary-button"
-                        style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
-                        <span class="icon">🧠</span> التحليل اللغوي والمعجم
-                    </button>
-                </section>
+
 
                 <!-- Section 3: Research & External Resources -->
                 <section class="action-card">

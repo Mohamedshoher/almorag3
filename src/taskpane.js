@@ -35,12 +35,25 @@ Office.onReady((info) => {
         const modal = document.getElementById("settings-modal");
         const settingsBtn = document.getElementById("settings-btn");
         const closeBtn = document.getElementById("close-settings");
+        const apiKeyInput = document.getElementById("api-key");
+        const modelSelect = document.getElementById("model-select");
+
+        // استرجاع الإعدادات المحفوظة
+        const savedApiKey = localStorage.getItem("gemini_api_key");
+        const savedModel = localStorage.getItem("gemini_model");
+        if (savedApiKey) apiKeyInput.value = savedApiKey;
+        if (savedModel) modelSelect.value = savedModel;
 
         if (settingsBtn) {
             settingsBtn.onclick = () => modal.classList.remove("hidden");
         }
         if (closeBtn) {
-            closeBtn.onclick = () => modal.classList.add("hidden");
+            closeBtn.onclick = () => {
+                // حفظ الإعدادات عند الإغلاق
+                localStorage.setItem("gemini_api_key", apiKeyInput.value.trim());
+                localStorage.setItem("gemini_model", modelSelect.value.trim());
+                modal.classList.add("hidden");
+            };
         }
 
         // Quran Modal Logic
