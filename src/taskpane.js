@@ -38,9 +38,18 @@ Office.onReady((info) => {
         const apiKeyInput = document.getElementById("api-key");
         const modelSelect = document.getElementById("model-select");
 
-        // استرجاع الإعدادات المحفوظة
-        const savedApiKey = localStorage.getItem("gemini_api_key");
-        const savedModel = localStorage.getItem("gemini_model");
+        // استرجاع الإعدادات (الأولوية لـ localStorage ثم للملف المحلي config.js)
+        let savedApiKey = localStorage.getItem("gemini_api_key");
+        let savedModel = localStorage.getItem("gemini_model");
+
+        // إذا كانت الذاكرة فارغة، نأخذ من ملف config.js المحلي (إن وجد)
+        if (!savedApiKey && window.LOCAL_CONFIG && window.LOCAL_CONFIG.apiKey) {
+            savedApiKey = window.LOCAL_CONFIG.apiKey;
+        }
+        if (!savedModel && window.LOCAL_CONFIG && window.LOCAL_CONFIG.defaultModel) {
+            savedModel = window.LOCAL_CONFIG.defaultModel;
+        }
+
         if (savedApiKey) apiKeyInput.value = savedApiKey;
         if (savedModel) modelSelect.value = savedModel;
 

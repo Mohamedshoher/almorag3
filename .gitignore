@@ -1,1 +1,30 @@
-node_modules
+# Dependencies
+node_modules/
+dist/
+.cache/
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.log
+
+# OS Files
+Thumbs.db
+.DS_Store
+
+# Environment Variables (Crucial for security)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Office Add-in specific
+*.user
+binary.runtime
+*.certs
+
+# Local User Config
+src/config.js
