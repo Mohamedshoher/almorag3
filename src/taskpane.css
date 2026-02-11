@@ -1199,3 +1199,55 @@ h1 {
 .analysis-container::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
 }
+
+/* Highlight Settings Styles */
+.highlight-settings {
+    margin-top: 15px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 12px;
+    user-select: none;
+}
+
+.checkbox-container input {
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+}
+
+.checkbox-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.color-picker-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.color-picker-container input[type="color"] {
+    border: none;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    background: none;
+    padding: 0;
+    border-radius: 4px;
+}
+
+.color-value-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}

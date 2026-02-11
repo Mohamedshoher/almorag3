@@ -37,10 +37,14 @@ Office.onReady((info) => {
         const closeBtn = document.getElementById("close-settings");
         const apiKeyInput = document.getElementById("api-key");
         const modelSelect = document.getElementById("model-select");
+        const highlightCheck = document.getElementById("highlight-corrections");
+        const highlightColorInput = document.getElementById("highlight-color");
 
         // استرجاع الإعدادات (الأولوية لـ localStorage ثم للملف المحلي config.js)
         let savedApiKey = localStorage.getItem("gemini_api_key");
         let savedModel = localStorage.getItem("gemini_model");
+        let savedHighlight = localStorage.getItem("highlight_corrections") === "true";
+        let savedHighlightColor = localStorage.getItem("highlight_color") || "#ffff00";
 
         // إذا كانت الذاكرة فارغة، نأخذ من ملف config.js المحلي (إن وجد)
         if (!savedApiKey && window.LOCAL_CONFIG && window.LOCAL_CONFIG.apiKey) {
@@ -52,6 +56,8 @@ Office.onReady((info) => {
 
         if (savedApiKey) apiKeyInput.value = savedApiKey;
         if (savedModel) modelSelect.value = savedModel;
+        if (highlightCheck) highlightCheck.checked = savedHighlight;
+        if (highlightColorInput) highlightColorInput.value = savedHighlightColor;
 
         if (settingsBtn) {
             settingsBtn.onclick = () => modal.classList.remove("hidden");
@@ -61,6 +67,8 @@ Office.onReady((info) => {
                 // حفظ الإعدادات عند الإغلاق
                 localStorage.setItem("gemini_api_key", apiKeyInput.value.trim());
                 localStorage.setItem("gemini_model", modelSelect.value.trim());
+                if (highlightCheck) localStorage.setItem("highlight_corrections", highlightCheck.checked);
+                if (highlightColorInput) localStorage.setItem("highlight_color", highlightColorInput.value);
                 modal.classList.add("hidden");
             };
         }
@@ -890,7 +898,16 @@ window.applyCorrection = async (error, correction, btn) => {
         results.load("items");
         await context.sync();
         if (results.items.length > 0) {
-            results.items[0].insertText(correction, Word.InsertLocation.replace);
+            const range = results.items[0];
+            range.insertText(correction, Word.InsertLocation.replace);
+
+            // تطبيق تلوين التعديل إذا كان الخيار مفعلاً
+            const doHighlight = localStorage.getItem("highlight_corrections") === "true";
+            if (doHighlight) {
+                const highlightColor = localStorage.getItem("highlight_color") || "#ffff00";
+                range.shading.backgroundPatternColor = highlightColor;
+            }
+
             await context.sync();
             success = true;
 
@@ -936,7 +953,10 @@ window.undoCorrection = async (index) => {
         results.load("items");
         await context.sync();
         if (results.items.length > 0) {
-            results.items[0].insertText(item.error, Word.InsertLocation.replace);
+            const range = results.items[0];
+            range.insertText(item.error, Word.InsertLocation.replace);
+            // إزالة التلوين عند التراجع
+            range.shading.backgroundPatternColor = null;
             await context.sync();
 
             // Remove from history
@@ -1010,6 +1030,9 @@ window.applyBatch = async (category) => {
     const mistakes = globalMistakes[category];
     if (!mistakes || mistakes.length === 0) return;
 
+    const doHighlight = localStorage.getItem("highlight_corrections") === "true";
+    const highlightColor = localStorage.getItem("highlight_color") || "#ffff00";
+
     await Word.run(async (context) => {
         if (category === 'spaces') {
             const results = context.document.body.search(" {2,}", { matchWildcards: true });
@@ -1017,6 +1040,7 @@ window.applyBatch = async (category) => {
             await context.sync();
             for (const item of results.items) {
                 item.insertText(" ", Word.InsertLocation.replace);
+                if (doHighlight) item.shading.backgroundPatternColor = highlightColor;
             }
         } else {
             for (const m of mistakes) {
@@ -1025,6 +1049,7 @@ window.applyBatch = async (category) => {
                 await context.sync();
                 for (const item of results.items) {
                     item.insertText(m.correction, Word.InsertLocation.replace);
+                    if (doHighlight) item.shading.backgroundPatternColor = highlightColor;
                 }
             }
         }
